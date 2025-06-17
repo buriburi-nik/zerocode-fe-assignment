@@ -30,12 +30,8 @@ export const SignIn = ({ onNavigateToSignUp }) => {
     try {
       const result = await login(formData.email, formData.password);
       if (result.success) {
-        console.log("Login successful, redirecting to main page...");
-        // The App.jsx will automatically redirect based on user state change
-        // Keep loading state briefly to show success
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 500);
+        console.log("Login successful");
+        // App.jsx will auto-redirect based on user change
       }
     } catch (err) {
       console.error("Login error:", err);
@@ -59,7 +55,7 @@ export const SignIn = ({ onNavigateToSignUp }) => {
 
   return (
     <div className="flex items-center justify-center min-h-screen p-4 bg-gradient-to-br from-red-50 via-white to-orange-50 dark:from-white-900 dark:via-white-800 dark:to-red-900">
-      <Card className="w-full max-w-md border-0 shadow-2xl bg-black/80 dark: bg-slate-500">
+      <Card className="w-full max-w-md border-0 shadow-2xl bg-black/80 dark:bg-slate-500">
         <CardHeader className="pb-8 space-y-4 text-center">
           <div className="flex items-center justify-center w-16 h-16 mx-auto bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl">
             <div className="flex items-center justify-center w-8 h-8 bg-white rounded-lg dark:bg-white-900">
@@ -86,7 +82,7 @@ export const SignIn = ({ onNavigateToSignUp }) => {
                 <div>
                   <strong>✨ ZeroCode Chat</strong>
                   <br />
-                   Try the demo account:
+                  Try the demo account:
                   <br />
                   <button
                     onClick={handleDemoLogin}

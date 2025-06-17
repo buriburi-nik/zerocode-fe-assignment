@@ -16,15 +16,15 @@ const AppContent = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-900">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-900">
         <div className="text-center">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center mb-4">
-            <div className="w-8 h-8 bg-white dark:bg-gray-900 rounded-lg flex items-center justify-center">
-              <div className="w-4 h-4 bg-gradient-to-br from-indigo-600 to-purple-600 rounded animate-pulse"></div>
+          <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl">
+            <div className="flex items-center justify-center w-8 h-8 bg-white rounded-lg dark:bg-gray-900">
+              <div className="w-4 h-4 rounded bg-gradient-to-br from-indigo-600 to-purple-600 animate-pulse"></div>
             </div>
           </div>
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400 font-medium">
+          <div className="w-8 h-8 mx-auto mb-4 border-b-2 border-indigo-600 rounded-full animate-spin"></div>
+          <p className="font-medium text-gray-600 dark:text-gray-400">
             Loading ZeroCode Chat...
           </p>
         </div>
@@ -32,12 +32,12 @@ const AppContent = () => {
     );
   }
 
-  // If user is authenticated, show the main chat page
+  // ✅ Show main chat interface if logged in
   if (user) {
     return <Chat user={user} onLogout={logout} />;
   }
 
-  // If not authenticated, show authentication pages
+  // 🧾 Show SignIn or SignUp based on state
   if (currentPage === "signin") {
     return <SignIn onNavigateToSignUp={() => setCurrentPage("signup")} />;
   }
@@ -46,7 +46,7 @@ const AppContent = () => {
     return <SignUp onNavigateToSignIn={() => setCurrentPage("signin")} />;
   }
 
-  // Default fallback to signin
+  // Default fallback
   return <SignIn onNavigateToSignUp={() => setCurrentPage("signup")} />;
 };
 
