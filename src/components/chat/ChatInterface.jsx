@@ -32,7 +32,6 @@ import {
   ChevronDown,
   Zap,
 } from "lucide-react";
-import { useTheme } from "@/hooks/useTheme.js";
 import { useVoiceRecognition } from "@/hooks/useVoiceRecognition.js";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis.js";
 import { AnalyticsDashboard } from "@/components/analytics/AnalyticsDashboard.jsx";
@@ -52,9 +51,62 @@ export const ChatInterface = ({ user, onLogout }) => {
   const [currentChatId, setCurrentChatId] = useState("");
   const [chatHistory, setChatHistory] = useState({});
 
+  // Self-contained theme state management
+  const [isDark, setIsDark] = useState(() => {
+    // First check localStorage
+    const savedTheme = localStorage.getItem("zerocode_chat_theme");
+    if (savedTheme) {
+      return savedTheme === "dark";
+    }
+
+    // Fall back to system preference
+    if (typeof window !== "undefined") {
+      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    }
+
+    // Default to light mode
+    return false;
+  });
+
   const messagesEndRef = useRef(null);
   const { toast } = useToast();
-  const { isDark, toggleTheme } = useTheme();
+
+  // Theme management effect
+  useEffect(() => {
+    // Save theme preference to localStorage
+    localStorage.setItem("zerocode_chat_theme", isDark ? "dark" : "light");
+
+    // Apply theme to document root for this component's context
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [isDark]);
+
+  // Listen for system theme changes
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+    const handleChange = (e) => {
+      // Only update if user hasn't manually set a preference
+      const savedTheme = localStorage.getItem("zerocode_chat_theme");
+      if (!savedTheme) {
+        setIsDark(e.matches);
+      }
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
+
+  // Toggle theme function
+  const toggleTheme = useCallback(() => {
+    setIsDark((prevIsDark) => !prevIsDark);
+  }, []);
   const {
     isListening,
     transcript,
@@ -529,21 +581,32 @@ export const ChatInterface = ({ user, onLogout }) => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+    <div
+      className={cn(
+        "flex h-screen transition-colors duration-300",
+        isDark ? "bg-gray-900" : "bg-gray-50",
+      )}
+    >
       {/* Sidebar */}
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0",
+          "fixed inset-y-0 left-0 z-50 w-64 shadow-xl transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0",
+          isDark ? "bg-gray-800" : "bg-white",
           sidebarOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
         <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+          <div
+            className={cn(
+              "flex items-center justify-between p-4 border-b transition-colors duration-300",
+              isDark ? "border-gray-700" : "border-gray-200",
+            )}
+          >
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-red-500 to-orange-500">
                 <Zap className="w-4 h-4 text-white" />
               </div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-xl font-bold text-transparent bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text">
                 ZeroCode Chat
               </h1>
             </div>
@@ -560,7 +623,7 @@ export const ChatInterface = ({ user, onLogout }) => {
           <div className="flex-1 p-4 space-y-3">
             <Button
               onClick={startNewChat}
-              className="w-full justify-start bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
+              className="justify-start w-full text-white bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600"
             >
               <Plus className="w-4 h-4 mr-2" />
               New Chat
@@ -569,7 +632,7 @@ export const ChatInterface = ({ user, onLogout }) => {
             <Button
               variant="ghost"
               onClick={() => setShowHistory(true)}
-              className="w-full justify-start"
+              className="justify-start w-full"
             >
               <History className="w-4 h-4 mr-2" />
               Chat History
@@ -578,7 +641,7 @@ export const ChatInterface = ({ user, onLogout }) => {
             <Button
               variant="ghost"
               onClick={() => setShowAnalytics(true)}
-              className="w-full justify-start"
+              className="justify-start w-full"
             >
               <BarChart3 className="w-4 h-4 mr-2" />
               Analytics
@@ -589,7 +652,7 @@ export const ChatInterface = ({ user, onLogout }) => {
             <Button
               variant="ghost"
               onClick={toggleTheme}
-              className="w-full justify-start"
+              className="justify-start w-full"
             >
               {isDark ? (
                 <Sun className="w-4 h-4 mr-2" />
@@ -603,7 +666,7 @@ export const ChatInterface = ({ user, onLogout }) => {
               <Button
                 variant="ghost"
                 onClick={() => setAutoSpeak(!autoSpeak)}
-                className="w-full justify-start"
+                className="justify-start w-full"
               >
                 {autoSpeak ? (
                   <Volume2 className="w-4 h-4 mr-2" />
@@ -615,18 +678,23 @@ export const ChatInterface = ({ user, onLogout }) => {
             )}
           </div>
 
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex items-center space-x-3 mb-3">
+          <div
+            className={cn(
+              "p-4 border-t transition-colors duration-300",
+              isDark ? "border-gray-700" : "border-gray-200",
+            )}
+          >
+            <div className="flex items-center mb-3 space-x-3">
               <Avatar>
-                <AvatarFallback className="bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400">
+                <AvatarFallback className="text-indigo-600 bg-indigo-100 dark:bg-indigo-900 dark:text-indigo-400">
                   <User className="w-4 h-4" />
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-gray-900 dark:text-gray-100 truncate">
+                <p className="font-medium text-gray-900 truncate dark:text-red-400">
                   {user.name}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                <p className="text-xs text-gray-500 truncate dark:text-gray-400">
                   {user.email}
                 </p>
               </div>
@@ -634,7 +702,7 @@ export const ChatInterface = ({ user, onLogout }) => {
             <Button
               variant="ghost"
               onClick={onLogout}
-              className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+              className="justify-start w-full text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
             >
               <LogOut className="w-4 h-4 mr-2" />
               Logout
@@ -646,15 +714,20 @@ export const ChatInterface = ({ user, onLogout }) => {
       {/* Overlay for mobile */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex flex-col flex-1">
         {/* Header */}
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4">
+        <div
+          className={cn(
+            "p-4 border-b transition-colors duration-300",
+            isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200",
+          )}
+        >
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Button
@@ -667,7 +740,7 @@ export const ChatInterface = ({ user, onLogout }) => {
               </Button>
               <div className="flex items-center space-x-3">
                 <Avatar>
-                  <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-purple-500 text-white">
+                  <AvatarFallback className="text-white bg-gradient-to-br from-indigo-500 to-purple-500">
                     <Bot className="w-4 h-4" />
                   </AvatarFallback>
                 </Avatar>
@@ -676,7 +749,7 @@ export const ChatInterface = ({ user, onLogout }) => {
                     AI Assistant
                   </h2>
                   <div className="flex items-center space-x-4">
-                    <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
+                    <p className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                       <div
                         className={cn(
                           "w-2 h-2 rounded-full mr-2",
@@ -687,7 +760,7 @@ export const ChatInterface = ({ user, onLogout }) => {
                       ></div>
                       {ChatService.getServiceStatus()}
                     </p>
-                    <p className="text-xs text-blue-600 dark:text-blue-400 flex items-center">
+                    <p className="flex items-center text-xs text-blue-600 dark:text-blue-400">
                       <Zap className="w-3 h-3 mr-1" />
                       Frontend Only
                     </p>
@@ -724,19 +797,19 @@ export const ChatInterface = ({ user, onLogout }) => {
         <ScrollArea className="flex-1 p-4">
           <div className="max-w-4xl mx-auto space-y-4">
             {messages.length === 0 && (
-              <Card className="text-center py-12">
+              <Card className="py-12 text-center">
                 <CardContent>
-                  <div className="mx-auto w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900 dark:to-purple-900 rounded-full flex items-center justify-center mb-4">
-                    <Bot className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+                  <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-red-100 to-orange-100 dark:from-red-900 dark:to-orange-900">
+                    <Bot className="w-8 h-8 text-red-600 dark:text-red-400" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                  <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
                     Hello {user.name}! 👋
                   </h3>
-                  <p className="text-gray-500 dark:text-gray-400 mb-4">
+                  <p className="mb-4 text-gray-500 dark:text-gray-400">
                     Start a conversation with your AI assistant! You can type,
                     use voice input, or ask for help.
                   </p>
-                  <div className="inline-flex items-center px-3 py-1 rounded-full text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">
+                  <div className="inline-flex items-center px-3 py-1 text-xs text-green-700 bg-green-100 rounded-full dark:bg-green-900 dark:text-green-300">
                     <Zap className="w-3 h-3 mr-1" />
                     Pure Frontend • No Backend Required
                   </div>
@@ -758,7 +831,7 @@ export const ChatInterface = ({ user, onLogout }) => {
                   <AvatarFallback
                     className={cn(
                       message.sender === "user"
-                        ? "bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400"
+                        ? "bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400"
                         : "bg-gradient-to-br from-indigo-500 to-purple-500 text-white",
                     )}
                   >
@@ -773,7 +846,7 @@ export const ChatInterface = ({ user, onLogout }) => {
                   className={cn(
                     "max-w-[70%]",
                     message.sender === "user"
-                      ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white border-0"
+                      ? "bg-gradient-to-r from-red-500 to-orange-500 text-white border-0"
                       : "bg-white dark:bg-gray-800",
                   )}
                 >
@@ -784,7 +857,7 @@ export const ChatInterface = ({ user, onLogout }) => {
                         className={cn(
                           "text-xs",
                           message.sender === "user"
-                            ? "text-indigo-100"
+                            ? "text-red-100"
                             : "text-gray-500 dark:text-gray-400",
                         )}
                       >
@@ -796,7 +869,7 @@ export const ChatInterface = ({ user, onLogout }) => {
                           variant="ghost"
                           size="sm"
                           onClick={() => speak(message.text)}
-                          className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                          className="w-6 h-6 p-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                           title="Click to speak this message"
                         >
                           <Volume2 className="w-3 h-3" />
@@ -811,7 +884,7 @@ export const ChatInterface = ({ user, onLogout }) => {
             {isTyping && (
               <div className="flex items-start space-x-3">
                 <Avatar>
-                  <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-purple-500 text-white">
+                  <AvatarFallback className="text-white bg-gradient-to-br from-indigo-500 to-purple-500">
                     <Bot className="w-4 h-4" />
                   </AvatarFallback>
                 </Avatar>
@@ -819,8 +892,8 @@ export const ChatInterface = ({ user, onLogout }) => {
                   <CardContent className="p-3">
                     <div className="flex space-x-1">
                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></div>
+                      <div className="w-2 h-2 delay-100 bg-gray-400 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 delay-200 bg-gray-400 rounded-full animate-bounce"></div>
                     </div>
                   </CardContent>
                 </Card>
@@ -832,7 +905,12 @@ export const ChatInterface = ({ user, onLogout }) => {
         </ScrollArea>
 
         {/* Input Area */}
-        <div className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4">
+        <div
+          className={cn(
+            "p-4 border-t transition-colors duration-300",
+            isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200",
+          )}
+        >
           <div className="max-w-4xl mx-auto">
             <div className="flex items-end space-x-2">
               <div className="flex-1">
@@ -867,7 +945,7 @@ export const ChatInterface = ({ user, onLogout }) => {
               <Button
                 onClick={sendMessage}
                 disabled={!inputValue.trim() || isTyping}
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white h-11"
+                className="text-white bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 h-11"
               >
                 <Send className="w-4 h-4" />
               </Button>

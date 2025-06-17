@@ -20,7 +20,7 @@ export const ChatHistory = ({
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh]">
         <DialogHeader className="flex flex-row items-center justify-between">
-          <DialogTitle className="text-2xl font-bold flex items-center space-x-2">
+          <DialogTitle className="flex items-center space-x-2 text-2xl font-bold">
             <History className="w-6 h-6 text-indigo-600" />
             <span>Chat History</span>
           </DialogTitle>
@@ -28,9 +28,9 @@ export const ChatHistory = ({
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="h-6 w-6 p-0"
+            className="w-6 h-6 p-0"
           >
-            <X className="h-4 w-4" />
+            <X className="w-4 h-4" />
           </Button>
         </DialogHeader>
 
@@ -39,17 +39,17 @@ export const ChatHistory = ({
             {Object.entries(chatHistory).length === 0 ? (
               <Card className="p-8 text-center">
                 <CardContent className="space-y-4">
-                  <div className="mx-auto w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                  <div className="flex items-center justify-center w-16 h-16 mx-auto bg-gray-100 rounded-full dark:bg-gray-800">
                     <MessageSquare className="w-8 h-8 text-gray-400" />
                   </div>
                   <div>
                     <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
                       No chat history yet
                     </h3>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="mt-1 text-gray-500 dark:text-gray-400">
                       Start a conversation to see your chat history here
                     </p>
-                    <div className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 mt-3">
+                    <div className="inline-flex items-center px-2 py-1 mt-3 text-xs text-blue-700 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">
                       <Zap className="w-3 h-3 mr-1" />
                       Stored locally in your browser
                     </div>
@@ -81,7 +81,7 @@ export const ChatHistory = ({
                 return (
                   <Card
                     key={chatId}
-                    className="hover:shadow-md transition-all duration-200 cursor-pointer border-l-4 border-l-indigo-500"
+                    className="transition-all duration-200 border-l-4 cursor-pointer hover:shadow-md border-l-indigo-500"
                   >
                     <CardContent className="p-4">
                       <div
@@ -89,12 +89,12 @@ export const ChatHistory = ({
                         onClick={() => onLoadChat(chatId)}
                       >
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-gray-900 dark:text-gray-100 truncate">
+                          <h3 className="font-medium text-gray-900 truncate dark:text-gray-100">
                             {title.length > 50
                               ? `${title.substring(0, 50)}...`
                               : title}
                           </h3>
-                          <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500 dark:text-gray-400">
+                          <div className="flex items-center mt-2 space-x-4 text-sm text-gray-500 dark:text-gray-400">
                             <div className="flex items-center space-x-1">
                               <Calendar className="w-4 h-4" />
                               <span>
@@ -114,7 +114,7 @@ export const ChatHistory = ({
                             e.stopPropagation();
                             onDeleteChat(chatId);
                           }}
-                          className="ml-2 h-8 w-8 p-0 text-red-500 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                          className="w-8 h-8 p-0 ml-2 text-red-500 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
