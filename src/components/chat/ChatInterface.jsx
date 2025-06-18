@@ -408,8 +408,8 @@ function ChatInterface() {
                   <div className="flex items-center justify-center w-16 h-16 mx-auto bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl">
                     <MessageSquare className="w-8 h-8 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-black dark:text-gray-500">
-                    Welcome to ZeroCode Chat!
+                  <h3 className="text-xl font-semibold text-black dark:text-gray-400">
+                    Welcome to ZeroCode Chat
                   </h3>
                   <p className="text-gray-700 dark:text-gray-400">
                     Start a conversation with our AI assistant. Ask questions,
