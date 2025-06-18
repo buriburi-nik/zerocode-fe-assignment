@@ -135,7 +135,12 @@ function ChatHistory({
                         </div>
                         {chat.messages?.length > 0 && (
                           <p className="mt-2 text-sm text-slate-700 dark:text-gray-300 text-high-contrast line-clamp-2">
-                            {chat.messages[chat.messages.length - 1]?.text}
+                            {(() => {
+                              const lastMessage =
+                                chat.messages[chat.messages.length - 1];
+                              const text = lastMessage?.text;
+                              return typeof text === "string" ? text : "";
+                            })()}
                           </p>
                         )}
                       </div>

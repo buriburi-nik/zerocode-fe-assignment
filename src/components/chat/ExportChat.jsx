@@ -61,7 +61,22 @@ function ExportChat({ messages, user, onExport }) {
         }
 
         const sender = message.sender === "user" ? "You" : "AI Assistant";
-        const timestamp = new Date(message.timestamp).toLocaleString();
+        let timestamp;
+        try {
+          if (
+            (message.timestamp && typeof message.timestamp !== "object") ||
+            message.timestamp instanceof Date
+          ) {
+            const date = new Date(message.timestamp);
+            timestamp = isNaN(date.getTime())
+              ? new Date().toLocaleString()
+              : date.toLocaleString();
+          } else {
+            timestamp = new Date().toLocaleString();
+          }
+        } catch {
+          timestamp = new Date().toLocaleString();
+        }
 
         doc.setFontSize(12);
         doc.setFont(undefined, "bold");

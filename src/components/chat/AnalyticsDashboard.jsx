@@ -134,11 +134,23 @@ function AnalyticsDashboard({ data, onClose }) {
               {dailyUsage.map((day, index) => (
                 <div key={index} className="flex items-center space-x-4">
                   <div className="w-20 text-sm text-slate-800 dark:text-gray-400 text-high-contrast">
-                    {new Date(day.date).toLocaleDateString("en-US", {
-                      weekday: "short",
-                      month: "short",
-                      day: "numeric",
-                    })}
+                    {(() => {
+                      try {
+                        if (day.date && typeof day.date === "string") {
+                          const date = new Date(day.date);
+                          return isNaN(date.getTime())
+                            ? "Invalid"
+                            : date.toLocaleDateString("en-US", {
+                                weekday: "short",
+                                month: "short",
+                                day: "numeric",
+                              });
+                        }
+                        return "Invalid";
+                      } catch {
+                        return "Invalid";
+                      }
+                    })()}
                   </div>
                   <div className="flex-1">
                     <div

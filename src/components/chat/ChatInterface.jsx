@@ -173,7 +173,7 @@ function ChatInterface() {
     }
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
@@ -453,7 +453,7 @@ function ChatInterface() {
                     >
                       <CardContent className="p-3">
                         <p className="text-sm whitespace-pre-wrap break-words">
-                          {message.text}
+                          {typeof message.text === "string" ? message.text : ""}
                         </p>
                         <p
                           className={cn(
@@ -539,7 +539,7 @@ function ChatInterface() {
               ref={textareaRef}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyDown}
               placeholder="Type your message here..."
               className={cn(
                 "min-h-[60px] max-h-32 resize-none",
