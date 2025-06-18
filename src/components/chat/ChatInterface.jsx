@@ -28,6 +28,7 @@ import {
   Bot,
   LogOut,
   Plus,
+  Zap,
   MessageSquare,
   Trash2,
 } from "lucide-react";
@@ -40,21 +41,6 @@ import ChatHistory from "./ChatHistory";
 import AnalyticsDashboard from "./AnalyticsDashboard";
 import VoiceControls from "./VoiceControls";
 import ExportChat from "./ExportChat";
-
-// Zero Logo Component
-const ZeroLogo = ({ className, size = "w-8 h-8" }) => (
-  <div className={cn("relative", className)}>
-    <div className={cn("bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center", size)}>
-      <div className={cn("border-2 border-white rounded-full flex items-center justify-center", 
-        size === "w-8 h-8" ? "w-5 h-5" : "w-10 h-10"
-      )}>
-        <div className={cn("bg-white rounded-full opacity-20", 
-          size === "w-8 h-8" ? "w-2 h-2" : "w-4 h-4"
-        )}></div>
-      </div>
-    </div>
-  </div>
-);
 
 function ChatInterface() {
   const { user, logout } = useAuth();
@@ -275,7 +261,9 @@ function ChatInterface() {
             )}
           >
             <div className="flex items-center space-x-3">
-              <ZeroLogo />
+              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-red-500 to-orange-500">
+                <Zap className="w-4 h-4 text-white" />
+              </div>
               <h1 className="text-xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
                 ZeroCode Chat
               </h1>
