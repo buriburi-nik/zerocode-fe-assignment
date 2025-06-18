@@ -208,7 +208,7 @@ export const SignUp = ({ onNavigateToSignIn }) => {
                 onClick={onNavigateToSignIn}
                 className="font-medium text-red-600 transition-colors dark:text-red-400 hover:text-red-500"
               >
-                Sign in here
+                Sign in here!
               </button>
             </p>
           </div>
