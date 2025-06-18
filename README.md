@@ -4,7 +4,7 @@ A production-ready chatbot web application built with React, featuring secure au
 
 ## 🚀 Live Demo
 
-**Demo URL:** https://zerocode-fe-assignment-henna.vercel.app/signin  
+**Demo URL:** https://zerocode-fe-assignment-git-main-buriburi-niks-projects.vercel.app/signin 
 **Repository:** https://github.com/buriburi-nik/zerocode-fe-assignment
 
 **Test Credentials:**
