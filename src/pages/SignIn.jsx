@@ -123,7 +123,7 @@ function SignIn() {
                 >
                   {isLoading
                     ? "Signing in..."
-                    : "🚀 Demo Login (demo@zerocode.com)"}
+                    : "🚀 Demo Login"}
                 </Button>
               </div>
             </AlertDescription>
