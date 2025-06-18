@@ -12,8 +12,19 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/contexts/AuthContext";
-import { Zap, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+// Zero Logo Component
+const ZeroLogo = ({ className }) => (
+  <div className={cn("relative", className)}>
+    <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+      <div className="w-10 h-10 border-4 border-white rounded-full flex items-center justify-center">
+        <div className="w-4 h-4 bg-white rounded-full opacity-20"></div>
+      </div>
+    </div>
+  </div>
+);
 
 function SignIn() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -80,8 +91,8 @@ function SignIn() {
       )}
       <Card className="w-full max-w-md shadow-2xl border-0 bg-white/95 dark:bg-gray-800/95 backdrop-blur">
         <CardHeader className="space-y-4 text-center">
-          <div className="flex items-center justify-center w-16 h-16 mx-auto bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl">
-            <Zap className="w-8 h-8 text-white" />
+          <div className="flex items-center justify-center mx-auto">
+            <ZeroLogo />
           </div>
           <div>
             <CardTitle className="text-2xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
