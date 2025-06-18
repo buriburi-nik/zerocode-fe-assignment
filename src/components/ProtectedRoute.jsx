@@ -1,10 +1,10 @@
-import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth.js";
 
 export const ProtectedRoute = ({ children }) => {
   const { user, isLoading } = useAuth();
 
+  // Show loading while checking authentication
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-900">
@@ -16,16 +16,18 @@ export const ProtectedRoute = ({ children }) => {
           </div>
           <div className="w-8 h-8 mx-auto mb-4 border-b-2 border-indigo-600 rounded-full animate-spin"></div>
           <p className="font-medium text-gray-600 dark:text-gray-400">
-            Loading...
+            Verifying access...
           </p>
         </div>
       </div>
     );
   }
 
+  // Redirect to signin if not authenticated or user is null
   if (!user) {
     return <Navigate to="/signin" replace />;
   }
 
+  // Render protected content only if user is properly authenticated and exists
   return children;
 };
