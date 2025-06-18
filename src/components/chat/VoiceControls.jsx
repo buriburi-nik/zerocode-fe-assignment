@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -35,8 +35,24 @@ function VoiceControls({ onVoiceInput, autoSpeak = true }) {
   } = useSpeechSynthesis();
 
   const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const lastInterimRef = useRef("");
+  const lastErrorRef = useRef("");
+  const toastTimeoutRef = useRef(null);
 
   const isSupported = voiceRecognitionSupported && speechSynthesisSupported;
+
+  // Debounced toast function to prevent excessive calls
+  const debouncedToast = useCallback(
+    (toastOptions, delay = 500) => {
+      if (toastTimeoutRef.current) {
+        clearTimeout(toastTimeoutRef.current);
+      }
+      toastTimeoutRef.current = setTimeout(() => {
+        toast(toastOptions);
+      }, delay);
+    },
+    [toast],
+  );
 
   // Handle voice input completion
   useEffect(() => {
@@ -44,6 +60,7 @@ function VoiceControls({ onVoiceInput, autoSpeak = true }) {
       onVoiceInput?.(transcript);
       resetTranscript();
 
+      // Show success toast without delay
       toast({
         title: "Voice input received",
         description: `"${transcript.substring(0, 50)}${transcript.length > 50 ? "..." : ""}"`,
@@ -51,22 +68,35 @@ function VoiceControls({ onVoiceInput, autoSpeak = true }) {
     }
   }, [transcript, isListening, onVoiceInput, resetTranscript, toast]);
 
-  // Handle interim transcript display
+  // Handle interim transcript display with debouncing
   useEffect(() => {
-    if (interimTranscript && isListening) {
-      // Show interim results as toast for user feedback
-      toast({
-        title: "Listening...",
-        description:
-          interimTranscript.substring(0, 100) +
-          (interimTranscript.length > 100 ? "..." : ""),
-      });
-    }
-  }, [interimTranscript, isListening, toast]);
+    if (
+      interimTranscript &&
+      isListening &&
+      interimTranscript !== lastInterimRef.current
+    ) {
+      lastInterimRef.current = interimTranscript;
 
-  // Handle voice recognition errors
+      // Only show interim transcript toast occasionally to avoid spam
+      if (interimTranscript.length > 10) {
+        debouncedToast(
+          {
+            title: "Listening...",
+            description:
+              interimTranscript.substring(0, 100) +
+              (interimTranscript.length > 100 ? "..." : ""),
+          },
+          1000,
+        );
+      }
+    }
+  }, [interimTranscript, isListening, debouncedToast]);
+
+  // Handle voice recognition errors with debouncing
   useEffect(() => {
-    if (voiceError) {
+    if (voiceError && voiceError !== lastErrorRef.current) {
+      lastErrorRef.current = voiceError;
+
       // Check if it's a network error and provide specific guidance
       const isNetworkError = voiceError.toLowerCase().includes("network");
       const isEdge =
@@ -88,13 +118,17 @@ function VoiceControls({ onVoiceInput, autoSpeak = true }) {
         }
       }
 
-      toast({
-        title,
-        description,
-        variant: "destructive",
-      });
+      // Debounce error toasts to prevent spam
+      debouncedToast(
+        {
+          title,
+          description,
+          variant: "destructive",
+        },
+        300,
+      );
     }
-  }, [voiceError, toast]);
+  }, [voiceError, debouncedToast]);
 
   // Initialize voice settings
   useEffect(() => {
@@ -188,6 +222,9 @@ function VoiceControls({ onVoiceInput, autoSpeak = true }) {
     return () => {
       if (window.voiceControlsSpeakResponse) {
         delete window.voiceControlsSpeakResponse;
+      }
+      if (toastTimeoutRef.current) {
+        clearTimeout(toastTimeoutRef.current);
       }
     };
   }, [voiceEnabled, speechSynthesisSupported]);

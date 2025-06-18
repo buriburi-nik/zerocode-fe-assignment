@@ -98,7 +98,12 @@ function ChatInterface() {
     const chat = chatHistory[chatId];
     if (chat) {
       setCurrentChatId(chatId);
-      setMessages(chat.messages || []);
+      // Ensure timestamps are properly converted from strings back to Date objects
+      const normalizedMessages = (chat.messages || []).map((message) => ({
+        ...message,
+        timestamp: message.timestamp ? new Date(message.timestamp) : new Date(),
+      }));
+      setMessages(normalizedMessages);
       setSidebarOpen(false);
     }
   };
@@ -458,7 +463,23 @@ function ChatInterface() {
                               : "text-gray-600 dark:text-gray-400",
                           )}
                         >
-                          {new Date(message.timestamp).toLocaleTimeString()}
+                          {(() => {
+                            try {
+                              if (
+                                (message.timestamp &&
+                                  typeof message.timestamp !== "object") ||
+                                message.timestamp instanceof Date
+                              ) {
+                                const date = new Date(message.timestamp);
+                                return isNaN(date.getTime())
+                                  ? new Date().toLocaleTimeString()
+                                  : date.toLocaleTimeString();
+                              }
+                              return new Date().toLocaleTimeString();
+                            } catch {
+                              return new Date().toLocaleTimeString();
+                            }
+                          })()}
                         </p>
                       </CardContent>
                     </Card>
