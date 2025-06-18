@@ -568,7 +568,7 @@ function ChatInterface() {
               }}
             />
             <Button
-              onClick={sendMessage}
+              onClick={() => sendMessage()}
               disabled={!inputValue.trim() || isTyping}
               className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white px-6"
             >
