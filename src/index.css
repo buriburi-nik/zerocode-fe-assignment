@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+@import "tailwindcss";
 
 @layer base {
   :root {
@@ -57,7 +57,9 @@
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
     font-family: Inter, sans-serif;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
   }
 
   html {
@@ -66,11 +68,456 @@
 }
 
 @layer components {
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
   .glass-effect {
     @apply border bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-white/20 dark:border-gray-800/20;
   }
 
   .gradient-text {
-    @apply text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text;
+    @apply text-transparent bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text;
+  }
+
+  /* High contrast text utilities for better visibility */
+  .text-high-contrast {
+    @apply text-slate-800 dark:text-gray-100;
+    color: rgb(30 41 59) !important; /* Force high contrast in light mode */
+  }
+
+  .dark .text-high-contrast {
+    color: rgb(241 245 249) !important; /* Force high contrast in dark mode */
+  }
+
+  /* Form elements high contrast */
+  .form-label {
+    @apply text-slate-800 dark:text-gray-200;
+    color: rgb(30 41 59) !important; /* Force high contrast for labels */
+  }
+
+  .dark .form-label {
+    color: rgb(
+      229 231 235
+    ) !important; /* Force high contrast for labels in dark mode */
+  }
+
+  .form-input {
+    @apply text-white dark:text-gray-100;
+    color: rgb(255 255 255) !important; /* Force white text */
+    background-color: rgb(31 41 55) !important; /* Force dark background */
+    border-color: rgb(75 85 99) !important; /* Force dark border */
+  }
+
+  .dark .form-input {
+    color: rgb(
+      248 250 252
+    ) !important; /* Force high contrast for input text in dark mode */
+    background-color: rgb(55 65 81) !important;
+    border-color: rgb(75 85 99) !important;
+  }
+
+  .form-input::placeholder {
+    color: rgb(209 213 219) !important; /* Light gray placeholder */
+  }
+
+  .dark .form-input::placeholder {
+    color: rgb(156 163 175) !important; /* Gray placeholder in dark mode */
+  }
+
+  /* Chat textarea specific styling for maximum visibility */
+  textarea[placeholder*="Type your message"] {
+    color: rgb(15 23 42) !important; /* Near-black text in light mode */
+    background-color: white !important;
+    border: 1px solid rgb(209 213 219) !important;
+  }
+
+  .dark textarea[placeholder*="Type your message"] {
+    color: rgb(248 250 252) !important; /* Near-white text in dark mode */
+    background-color: rgb(55 65 81) !important; /* Dark gray background */
+    border: 1px solid rgb(75 85 99) !important;
+  }
+
+  textarea[placeholder*="Type your message"]::placeholder {
+    color: rgb(100 116 139) !important; /* Medium gray placeholder */
+  }
+
+  .dark textarea[placeholder*="Type your message"]::placeholder {
+    color: rgb(
+      156 163 175
+    ) !important; /* Light gray placeholder in dark mode */
+  }
+
+  /* Additional override for chat interface textarea */
+  .chat-input-area textarea {
+    color: rgb(15 23 42) !important;
+    background-color: white !important;
+    caret-color: rgb(15 23 42) !important;
+  }
+
+  .dark .chat-input-area textarea {
+    color: rgb(248 250 252) !important;
+    background-color: rgb(55 65 81) !important;
+    caret-color: rgb(248 250 252) !important;
+  }
+
+  /* Toast positioning and visibility fixes */
+  .toast-container {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    z-index: 9999 !important;
+    max-width: 400px !important;
+  }
+
+  /* Background overlay for out-of-bounds elements */
+  .modal-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background-color: rgba(0, 0, 0, 0.03) !important;
+    z-index: 9998 !important;
+    pointer-events: none !important;
+    display: none !important;
+  }
+
+  .dark .modal-overlay {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+  }
+
+  /* Show overlay when toasts are visible */
+  body:has([data-sonner-toast]) .modal-overlay {
+    display: block !important;
+  }
+
+  /* Responsive toast positioning for mobile */
+  @media (max-width: 640px) {
+    .toast-container {
+      top: 20px !important;
+      right: 10px !important;
+      left: 10px !important;
+      max-width: calc(100vw - 20px) !important;
+    }
+
+    [data-sonner-toast] {
+      max-width: 100% !important;
+    }
+  }
+
+  /* Ensure toasts are never transparent and always visible */
+  [data-sonner-toast] {
+    opacity: 1 !important;
+    background-color: white !important;
+    border: 1px solid #e5e7eb !important;
+    color: #111827 !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
+    border-radius: 12px !important;
+    padding: 16px 20px !important;
+    font-size: 14px !important;
+    max-width: 400px !important;
+    word-wrap: break-word !important;
+    position: relative !important;
+    z-index: 10000 !important;
+  }
+
+  .dark [data-sonner-toast] {
+    background-color: rgba(31, 41, 55, 0.95) !important;
+    border: 1px solid #4b5563 !important;
+    color: #f9fafb !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* Success toast styling */
+  [data-sonner-toast][data-type="success"] {
+    border-left: 4px solid #10b981 !important;
+    background-color: rgba(255, 255, 255, 0.98) !important;
+  }
+
+  .dark [data-sonner-toast][data-type="success"] {
+    background-color: rgba(31, 41, 55, 0.98) !important;
+  }
+
+  /* Error toast styling */
+  [data-sonner-toast][data-type="error"] {
+    border-left: 4px solid #ef4444 !important;
+    background-color: rgba(255, 255, 255, 0.98) !important;
+  }
+
+  .dark [data-sonner-toast][data-type="error"] {
+    background-color: rgba(31, 41, 55, 0.98) !important;
+  }
+
+  /* Dropdown menu background overlay */
+  [data-radix-popper-content-wrapper] {
+    z-index: 9999 !important;
+  }
+
+  /* Ensure dropdown menus have proper background */
+  [role="menu"] {
+    background-color: white !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+    border-radius: 8px !important;
+  }
+
+  .dark [role="menu"] {
+    background-color: rgb(31, 41, 55) !important;
+    border: 1px solid #4b5563 !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
+}
+
+/* Animations */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: none;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+/* Loading overlay animations */
+.loading-overlay {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(4px);
+  }
+}
+
+.loading-card {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Input loading state */
+.input-loading {
+  transition: all 0.3s ease-in-out;
+}
+
+.input-loading:disabled {
+  background-color: rgb(75 85 99) !important;
+  color: rgb(156 163 175) !important;
+  cursor: not-allowed;
+}
+
+/* Page Preloader Styles */
+.preloader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #fef2f2 0%, #ffffff 50%, #fff7ed 100%);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: preloaderFadeIn 0.3s ease-out;
+}
+
+.dark .preloader-overlay {
+  background: linear-gradient(135deg, #1f2937 0%, #111827 50%, #374151 100%);
+}
+
+.preloader-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5em 0;
+}
+
+.preloader-svg {
+  width: 16em;
+  height: 8em;
+  margin-bottom: 2rem;
+}
+
+.preloader-track {
+  stroke: #e5e7eb;
+  transition: stroke 0.3s ease;
+}
+
+.dark .preloader-track {
+  stroke: #374151;
+}
+
+.preloader-worm1,
+.preloader-worm2 {
+  animation: worm1 2s linear infinite;
+}
+
+.preloader-worm2 {
+  animation-name: worm2;
+}
+
+.preloader-text {
+  text-align: center;
+  animation: preloaderTextSlide 0.6s ease-out 0.3s both;
+}
+
+.preloader-brand {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(to right, #ef4444, #f97316);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  margin-bottom: 0.5rem;
+}
+
+.preloader-loading {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+  animation: preloaderPulse 2s ease-in-out infinite;
+}
+
+.dark .preloader-loading {
+  color: #9ca3af;
+}
+
+/* Preloader Animations */
+@keyframes preloaderFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes preloaderFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.preloader-overlay.fade-out {
+  animation: preloaderFadeOut 0.3s ease-out forwards;
+}
+
+@keyframes preloaderTextSlide {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes preloaderPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes worm1 {
+  from {
+    stroke-dashoffset: 0;
+  }
+  50% {
+    animation-timing-function: steps(1);
+    stroke-dashoffset: -358;
+  }
+  50.01% {
+    animation-timing-function: linear;
+    stroke-dashoffset: 358;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes worm2 {
+  from {
+    stroke-dashoffset: 358;
+  }
+  50% {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -358;
   }
 }

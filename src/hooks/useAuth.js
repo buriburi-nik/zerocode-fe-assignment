@@ -2,34 +2,21 @@ import { useState, useEffect } from "react";
 import { AuthService } from "@/services/authService.js";
 
 export const useAuth = () => {
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // Check for existing user immediately to avoid loading states
+  const [user, setUser] = useState(() => {
+    try {
+      const token = localStorage.getItem("zerocode_session");
+      const userData = AuthService.getCurrentUser();
+      return token && userData ? { ...userData, token } : null;
+    } catch {
+      return null;
+    }
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      // Ensure demo user is set up
-      AuthService.setupDemoUser();
-
-      // Use the correct localStorage key that AuthService uses
-      const token = localStorage.getItem("zerocode_session");
-
-      if (token) {
-        try {
-          // Verify token
-          const userData = await AuthService.verifyToken(token);
-          setUser({ ...userData, token });
-        } catch (error) {
-          console.error("Token verification failed:", error);
-          // Clear invalid session data using correct keys
-          localStorage.removeItem("zerocode_session");
-          localStorage.removeItem("zerocode_current_user");
-        }
-      }
-
-      setIsLoading(false);
-    };
-
-    initializeAuth();
+    // Just ensure demo user is set up
+    AuthService.setupDemoUser();
   }, []);
 
   const login = async (email, password) => {

@@ -47,6 +47,14 @@ export const useVoiceRecognition = () => {
       "webkitSpeechRecognition" in window || "SpeechRecognition" in window;
     setIsSupported(speechRecognitionSupported);
 
+    // Log browser info for debugging
+    if (!speechRecognitionSupported) {
+      console.warn(
+        "Speech recognition not supported. Browser:",
+        navigator.userAgent,
+      );
+    }
+
     if (speechRecognitionSupported) {
       const SpeechRecognition =
         window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -154,6 +162,11 @@ export const useVoiceRecognition = () => {
 
       // Handle network-specific errors with retry logic
       const handleNetworkError = () => {
+        console.warn(
+          "Speech recognition network error. Browser:",
+          navigator.userAgent,
+        );
+
         if (!navigator.onLine) {
           setError(
             "No internet connection. Speech recognition requires an internet connection.",
@@ -162,10 +175,24 @@ export const useVoiceRecognition = () => {
           return;
         }
 
+        // Check for known browser issues
+        const isEdge =
+          navigator.userAgent.includes("Edge") ||
+          navigator.userAgent.includes("Edg/");
+        const isChrome = navigator.userAgent.includes("Chrome");
+
+        if (isEdge) {
+          setError(
+            "Speech recognition network error. This may be a known Edge browser issue. Try refreshing the page or using Chrome.",
+          );
+          setRetryCount(0);
+          return;
+        }
+
         if (retryCount < maxRetries) {
           const retryDelay = Math.pow(2, retryCount) * 1000; // Exponential backoff
           setError(
-            `Network error. Retrying in ${retryDelay / 1000} seconds... (${retryCount + 1}/${maxRetries})`,
+            `Network error connecting to speech service. Retrying in ${retryDelay / 1000} seconds... (${retryCount + 1}/${maxRetries})`,
           );
 
           retryTimeoutRef.current = setTimeout(() => {
@@ -173,9 +200,17 @@ export const useVoiceRecognition = () => {
             attemptRestart();
           }, retryDelay);
         } else {
-          setError(
-            "Network error: Unable to connect to speech recognition service. Please check your internet connection and try again later.",
-          );
+          let errorMessage =
+            "Network error: Unable to connect to speech recognition service.";
+
+          if (isChrome) {
+            errorMessage +=
+              " Try closing other tabs using the microphone, or refresh the page.";
+          } else {
+            errorMessage += " For best results, try using Google Chrome.";
+          }
+
+          setError(errorMessage);
           setRetryCount(0);
         }
       };
