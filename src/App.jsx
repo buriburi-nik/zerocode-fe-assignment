@@ -15,6 +15,8 @@ import SignIn from "@/pages/SignIn";
 import SignUp from "@/pages/SignUp";
 import Chat from "@/pages/Chat";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import Preloader from "@/components/Preloader";
+import { usePageTransition } from "@/hooks/usePageTransition";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,6 +29,7 @@ const queryClient = new QueryClient({
 
 function AppRoutes() {
   const { user, isLoading } = useAuth();
+  const { isLoading: isTransitioning } = usePageTransition();
 
   if (isLoading) {
     return (
@@ -37,32 +40,35 @@ function AppRoutes() {
   }
 
   return (
-    <Routes>
-      <Route
-        path="/signin"
-        element={user ? <Navigate to="/chat" replace /> : <SignIn />}
-      />
-      <Route
-        path="/signup"
-        element={user ? <Navigate to="/chat" replace /> : <SignUp />}
-      />
-      <Route
-        path="/chat"
-        element={
-          <ProtectedRoute>
-            <Chat />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/"
-        element={<Navigate to={user ? "/chat" : "/signin"} replace />}
-      />
-      <Route
-        path="*"
-        element={<Navigate to={user ? "/chat" : "/signin"} replace />}
-      />
-    </Routes>
+    <>
+      <Preloader isVisible={isTransitioning} />
+      <Routes>
+        <Route
+          path="/signin"
+          element={user ? <Navigate to="/chat" replace /> : <SignIn />}
+        />
+        <Route
+          path="/signup"
+          element={user ? <Navigate to="/chat" replace /> : <SignUp />}
+        />
+        <Route
+          path="/chat"
+          element={
+            <ProtectedRoute>
+              <Chat />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/"
+          element={<Navigate to={user ? "/chat" : "/signin"} replace />}
+        />
+        <Route
+          path="*"
+          element={<Navigate to={user ? "/chat" : "/signin"} replace />}
+        />
+      </Routes>
+    </>
   );
 }
 

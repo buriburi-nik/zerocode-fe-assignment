@@ -106,14 +106,62 @@
   }
 
   .form-input {
-    @apply text-slate-900 dark:text-gray-100;
-    color: rgb(15 23 42) !important; /* Force high contrast for input text */
+    @apply text-white dark:text-gray-100;
+    color: rgb(255 255 255) !important; /* Force white text */
+    background-color: rgb(31 41 55) !important; /* Force dark background */
+    border-color: rgb(75 85 99) !important; /* Force dark border */
   }
 
   .dark .form-input {
     color: rgb(
       248 250 252
     ) !important; /* Force high contrast for input text in dark mode */
+    background-color: rgb(55 65 81) !important;
+    border-color: rgb(75 85 99) !important;
+  }
+
+  .form-input::placeholder {
+    color: rgb(209 213 219) !important; /* Light gray placeholder */
+  }
+
+  .dark .form-input::placeholder {
+    color: rgb(156 163 175) !important; /* Gray placeholder in dark mode */
+  }
+
+  /* Chat textarea specific styling for maximum visibility */
+  textarea[placeholder*="Type your message"] {
+    color: rgb(15 23 42) !important; /* Near-black text in light mode */
+    background-color: white !important;
+    border: 1px solid rgb(209 213 219) !important;
+  }
+
+  .dark textarea[placeholder*="Type your message"] {
+    color: rgb(248 250 252) !important; /* Near-white text in dark mode */
+    background-color: rgb(55 65 81) !important; /* Dark gray background */
+    border: 1px solid rgb(75 85 99) !important;
+  }
+
+  textarea[placeholder*="Type your message"]::placeholder {
+    color: rgb(100 116 139) !important; /* Medium gray placeholder */
+  }
+
+  .dark textarea[placeholder*="Type your message"]::placeholder {
+    color: rgb(
+      156 163 175
+    ) !important; /* Light gray placeholder in dark mode */
+  }
+
+  /* Additional override for chat interface textarea */
+  .chat-input-area textarea {
+    color: rgb(15 23 42) !important;
+    background-color: white !important;
+    caret-color: rgb(15 23 42) !important;
+  }
+
+  .dark .chat-input-area textarea {
+    color: rgb(248 250 252) !important;
+    background-color: rgb(55 65 81) !important;
+    caret-color: rgb(248 250 252) !important;
   }
 
   /* Toast positioning and visibility fixes */
@@ -281,4 +329,195 @@
 
 .animate-bounce {
   animation: bounce 1s infinite;
+}
+
+/* Loading overlay animations */
+.loading-overlay {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(4px);
+  }
+}
+
+.loading-card {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Input loading state */
+.input-loading {
+  transition: all 0.3s ease-in-out;
+}
+
+.input-loading:disabled {
+  background-color: rgb(75 85 99) !important;
+  color: rgb(156 163 175) !important;
+  cursor: not-allowed;
+}
+
+/* Page Preloader Styles */
+.preloader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #fef2f2 0%, #ffffff 50%, #fff7ed 100%);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: preloaderFadeIn 0.3s ease-out;
+}
+
+.dark .preloader-overlay {
+  background: linear-gradient(135deg, #1f2937 0%, #111827 50%, #374151 100%);
+}
+
+.preloader-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5em 0;
+}
+
+.preloader-svg {
+  width: 16em;
+  height: 8em;
+  margin-bottom: 2rem;
+}
+
+.preloader-track {
+  stroke: #e5e7eb;
+  transition: stroke 0.3s ease;
+}
+
+.dark .preloader-track {
+  stroke: #374151;
+}
+
+.preloader-worm1,
+.preloader-worm2 {
+  animation: worm1 2s linear infinite;
+}
+
+.preloader-worm2 {
+  animation-name: worm2;
+}
+
+.preloader-text {
+  text-align: center;
+  animation: preloaderTextSlide 0.6s ease-out 0.3s both;
+}
+
+.preloader-brand {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(to right, #ef4444, #f97316);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  margin-bottom: 0.5rem;
+}
+
+.preloader-loading {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+  animation: preloaderPulse 2s ease-in-out infinite;
+}
+
+.dark .preloader-loading {
+  color: #9ca3af;
+}
+
+/* Preloader Animations */
+@keyframes preloaderFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes preloaderFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.preloader-overlay.fade-out {
+  animation: preloaderFadeOut 0.3s ease-out forwards;
+}
+
+@keyframes preloaderTextSlide {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes preloaderPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes worm1 {
+  from {
+    stroke-dashoffset: 0;
+  }
+  50% {
+    animation-timing-function: steps(1);
+    stroke-dashoffset: -358;
+  }
+  50.01% {
+    animation-timing-function: linear;
+    stroke-dashoffset: 358;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes worm2 {
+  from {
+    stroke-dashoffset: 358;
+  }
+  50% {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -358;
+  }
 }

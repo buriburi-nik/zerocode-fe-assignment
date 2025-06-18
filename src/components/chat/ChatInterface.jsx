@@ -408,7 +408,7 @@ function ChatInterface() {
                   <div className="flex items-center justify-center w-16 h-16 mx-auto bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl">
                     <MessageSquare className="w-8 h-8 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-slate-800 dark:text-gray-100">
+                  <h3 className="text-xl font-semibold text-black dark:text-gray-100">
                     Welcome to ZeroCode Chat!
                   </h3>
                   <p className="text-gray-700 dark:text-gray-400">
@@ -513,15 +513,25 @@ function ChatInterface() {
             isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200",
           )}
         >
-          <div className="flex space-x-2">
+          <div className="flex space-x-2 chat-input-area">
             <Textarea
               ref={textareaRef}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Type your message here..."
-              className="min-h-[60px] max-h-32 resize-none"
+              className={cn(
+                "min-h-[60px] max-h-32 resize-none",
+                isDark
+                  ? "text-gray-100 bg-gray-700 border-gray-600 placeholder:text-gray-400"
+                  : "text-slate-900 bg-white border-gray-300 placeholder:text-slate-500",
+              )}
               disabled={isTyping}
+              style={{
+                color: isDark ? "#f8fafc" : "#0f172a",
+                backgroundColor: isDark ? "#374151" : "#ffffff",
+                borderColor: isDark ? "#4b5563" : "#d1d5db",
+              }}
             />
             <Button
               onClick={sendMessage}

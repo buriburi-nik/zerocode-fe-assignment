@@ -13,6 +13,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/contexts/AuthContext";
 import { Zap, AlertCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 function SignIn() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -66,7 +67,17 @@ function SignIn() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-red-900 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-red-900 p-4 relative">
+      {isLoading && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center loading-overlay">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-2xl flex items-center space-x-3 loading-card">
+            <div className="w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+            <span className="text-slate-800 dark:text-gray-200 font-medium">
+              Signing in...
+            </span>
+          </div>
+        </div>
+      )}
       <Card className="w-full max-w-md shadow-2xl border-0 bg-white/95 dark:bg-gray-800/95 backdrop-blur">
         <CardHeader className="space-y-4 text-center">
           <div className="flex items-center justify-center w-16 h-16 mx-auto bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl">
@@ -118,6 +129,10 @@ function SignIn() {
                 onChange={(e) => handleInputChange("email", e.target.value)}
                 disabled={isLoading}
                 required
+                className={cn(
+                  "input-loading",
+                  isLoading ? "opacity-50 cursor-not-allowed" : "",
+                )}
               />
             </div>
 
@@ -131,6 +146,10 @@ function SignIn() {
                 onChange={(e) => handleInputChange("password", e.target.value)}
                 disabled={isLoading}
                 required
+                className={cn(
+                  "input-loading",
+                  isLoading ? "opacity-50 cursor-not-allowed" : "",
+                )}
               />
             </div>
 
