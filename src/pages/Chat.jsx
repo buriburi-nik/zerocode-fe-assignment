@@ -1,6 +1,8 @@
 import React from "react";
-import { ChatInterface } from "@/components/chat/ChatInterface.jsx";
+import ChatInterface from "@/components/chat/ChatInterface";
 
-export const Chat = ({ user, onLogout }) => {
-  return <ChatInterface user={user} onLogout={onLogout} />;
-};
+function Chat() {
+  return <ChatInterface />;
+}
+
+export default Chat;

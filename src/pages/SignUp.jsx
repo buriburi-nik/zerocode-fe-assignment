@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,72 +11,122 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useAuth } from "@/hooks/useAuth.js";
+import { useAuth } from "@/contexts/AuthContext";
+import { Zap, AlertCircle, Info } from "lucide-react";
 
-export const SignUp = ({ onNavigateToSignIn }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+function SignUp() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const { register } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError("");
 
-    // Validate password confirmation
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      setIsLoading(false);
+    // Validation
+    if (
+      !formData.name.trim() ||
+      !formData.email.trim() ||
+      !formData.password ||
+      !formData.confirmPassword
+    ) {
+      setError("Please fill in all fields");
       return;
     }
 
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+
     try {
-      const result = await register(
-        formData.name,
-        formData.email,
-        formData.password,
-      );
-      if (result.success) {
-        console.log("Registration successful, redirecting to main page...");
-        // The App.jsx will automatically redirect based on user state change
-        // Keep loading state briefly to show success
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 500);
-      }
+      console.log("Attempting registration...");
+      await register(formData.name, formData.email, formData.password);
+      console.log("Registration successful, navigating to chat...");
+      // The AuthContext will automatically update the user state
+      // The App routing will handle the redirect to /chat
     } catch (err) {
       console.error("Registration error:", err);
-      setError(err.message || "Sign up failed - please try again.");
+      setError(err.message || "Registration failed. Please try again.");
+    } finally {
       setIsLoading(false);
     }
   };
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    if (error) setError(""); // Clear error when user starts typing
+    if (error) setError("");
+  };
+
+  const generateTestEmail = () => {
+    const randomId = Math.random().toString(36).substring(2, 8);
+    const testEmail = `test${randomId}@example.com`;
+    const testName = `Test User ${randomId.toUpperCase()}`;
+    const testPassword = "password123";
+
+    setFormData({
+      name: testName,
+      email: testEmail,
+      password: testPassword,
+      confirmPassword: testPassword,
+    });
+    setError("");
+  };
+
+  const clearAllAccounts = () => {
+    if (
+      window.confirm(
+        "Clear all registered accounts? This will remove all user data except the demo account.",
+      )
+    ) {
+      try {
+        const demoUsers = {
+          "demo@zerocode.com": {
+            id: "demo_user",
+            name: "Demo User",
+            email: "demo@zerocode.com",
+            password: "demo123",
+            createdAt: new Date().toISOString(),
+          },
+        };
+        localStorage.setItem("zerocode_users", JSON.stringify(demoUsers));
+        setError("");
+        alert(
+          "All user accounts cleared (demo account preserved). You can now register with any email.",
+        );
+      } catch (e) {
+        alert("Failed to clear accounts: " + e.message);
+      }
+    }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4 bg-gradient-to-br from-red-50 via-white to-orange-50 dark:from-white-900 dark:via-white-800 dark:to-red-900">
-      <Card className="w-full max-w-md border-0 shadow-2xl bg-black/80 dark: bg-slate-500">
-        <CardHeader className="pb-8 space-y-4 text-center">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-red-900 p-4">
+      <Card className="w-full max-w-md shadow-2xl border-0 bg-white/95 dark:bg-gray-800/95 backdrop-blur">
+        <CardHeader className="space-y-4 text-center">
           <div className="flex items-center justify-center w-16 h-16 mx-auto bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl">
-            <div className="flex items-center justify-center w-8 h-8 bg-white rounded-lg dark:bg-white-900">
-              <div className="w-4 h-4 rounded bg-gradient-to-br from-red-500 to-orange-500"></div>
-            </div>
+            <Zap className="w-8 h-8 text-white" />
           </div>
           <div>
-            <CardTitle className="text-2xl font-bold text-transparent bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text">
+            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
               Join ZeroCode Chat
             </CardTitle>
-            <CardDescription className="mt-2 text-black-600 dark:text-white-300">
+            <CardDescription className="mt-2 text-slate-700 dark:text-gray-300">
               Create your account to start chatting with AI
             </CardDescription>
           </div>
@@ -83,87 +134,75 @@ export const SignUp = ({ onNavigateToSignIn }) => {
 
         <CardContent className="space-y-6">
           <Alert className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20">
+            <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
             <AlertDescription className="text-sm text-blue-700 dark:text-blue-300">
-              <div className="flex items-start space-x-2">
-                <div className="flex-shrink-0 mt-0.5">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                </div>
+              <div className="space-y-2">
                 <div>
                   <strong>🚀 Free Account</strong>
-                  <br />
+                </div>
+                <div>
                   Create a free account to access all features including chat
                   history, analytics, and voice input.
                 </div>
+                <div>
+                  <strong>💡 Demo:</strong> demo@zerocode.com | demo123
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={generateTestEmail}
+                  className="w-full mt-2 text-blue-700 border-blue-300 hover:bg-blue-100 dark:text-blue-300 dark:border-blue-600 dark:hover:bg-blue-800"
+                >
+                  🎲 Generate Test Account Details
+                </Button>
               </div>
             </AlertDescription>
           </Alert>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label
-                htmlFor="name"
-                className="text-white-700 dark:text-white-300"
-              >
-                Full Name
-              </Label>
+              <Label htmlFor="name">Full Name</Label>
               <Input
                 id="name"
                 type="text"
                 placeholder="Enter your full name"
                 value={formData.name}
                 onChange={(e) => handleInputChange("name", e.target.value)}
-                className="border-white-200 dark:border-white-700 focus:border-red-500 dark:focus:border-red-400"
+                disabled={isLoading}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label
-                htmlFor="email"
-                className="text-white-700 dark:text-white-300"
-              >
-                Email
-              </Label>
+              <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="Enter your email"
                 value={formData.email}
                 onChange={(e) => handleInputChange("email", e.target.value)}
-                className="border-white-200 dark:border-white-700 focus:border-red-500 dark:focus:border-red-400"
+                disabled={isLoading}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label
-                htmlFor="password"
-                className="text-white-700 dark:text-white-300"
-              >
-                Password
-              </Label>
+              <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder="Enter your password (min 6 characters)"
                 value={formData.password}
                 onChange={(e) => handleInputChange("password", e.target.value)}
-                className="border-white-200 dark:border-white-700 focus:border-red-500 dark:focus:border-red-400"
+                disabled={isLoading}
                 required
                 minLength={6}
               />
-              <p className="text-xs text-white-500 dark:text-white-400">
-                Password must be at least 6 characters long
-              </p>
             </div>
 
             <div className="space-y-2">
-              <Label
-                htmlFor="confirmPassword"
-                className="text-white-700 dark:text-white-300"
-              >
-                Confirm Password
-              </Label>
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -172,27 +211,66 @@ export const SignUp = ({ onNavigateToSignIn }) => {
                 onChange={(e) =>
                   handleInputChange("confirmPassword", e.target.value)
                 }
-                className="border-white-200 dark:border-white-700 focus:border-red-500 dark:focus:border-red-400"
+                disabled={isLoading}
                 required
               />
             </div>
 
             {error && (
               <Alert className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20">
-                <AlertDescription className="text-red-700 whitespace-pre-line dark:text-red-300">
+                <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                <AlertDescription className="text-red-700 dark:text-red-300">
                   {error}
+                  {error.includes("account with") &&
+                    error.includes("already exists") && (
+                      <div className="mt-3 space-y-2">
+                        <div className="flex gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => navigate("/signin")}
+                            className="text-red-700 border-red-300 hover:bg-red-100 dark:text-red-300 dark:border-red-600 dark:hover:bg-red-900/50"
+                          >
+                            Go to Sign In
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={generateTestEmail}
+                            className="text-blue-600 border-blue-300 hover:bg-blue-100 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-blue-800"
+                          >
+                            🎲 Use Test Email
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={clearAllAccounts}
+                            className="text-gray-600 border-gray-300 hover:bg-gray-100 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-800"
+                          >
+                            🧹 Clear All Accounts
+                          </Button>
+                        </div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          💡 Quick solutions: Use test email, sign in, or clear
+                          accounts for testing.
+                        </p>
+                      </div>
+                    )}
                 </AlertDescription>
               </Alert>
             )}
 
             <Button
               type="submit"
-              className="w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white shadow-lg transition-all duration-200 transform hover:scale-[1.02]"
+              className="w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white shadow-lg transition-all duration-200"
               disabled={isLoading}
             >
               {isLoading ? (
                 <div className="flex items-center space-x-2">
-                  <div className="w-4 h-4 border-b-2 border-white rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   <span>Creating account...</span>
                 </div>
               ) : (
@@ -202,18 +280,20 @@ export const SignUp = ({ onNavigateToSignIn }) => {
           </form>
 
           <div className="text-center">
-            <p className="text-sm text-black-600 dark:text-grey-400">
+            <p className="text-sm text-slate-700 dark:text-gray-400">
               Already have an account?{" "}
-              <button
-                onClick={onNavigateToSignIn}
-                className="font-medium text-red-600 transition-colors dark:text-red-400 hover:text-red-500"
+              <Link
+                to="/signin"
+                className="font-medium text-red-600 hover:text-red-500 dark:text-red-400 dark:hover:text-red-300 transition-colors"
               >
-                Sign in here!
-              </button>
+                Sign in here
+              </Link>
             </p>
           </div>
         </CardContent>
       </Card>
     </div>
   );
-};
+}
+
+export default SignUp;

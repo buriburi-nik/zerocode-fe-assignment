@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+@import "tailwindcss";
 
 @layer base {
   :root {
@@ -57,7 +57,9 @@
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
     font-family: Inter, sans-serif;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
   }
 
   html {
@@ -66,11 +68,217 @@
 }
 
 @layer components {
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
   .glass-effect {
     @apply border bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-white/20 dark:border-gray-800/20;
   }
 
   .gradient-text {
-    @apply text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text;
+    @apply text-transparent bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text;
   }
+
+  /* High contrast text utilities for better visibility */
+  .text-high-contrast {
+    @apply text-slate-800 dark:text-gray-100;
+    color: rgb(30 41 59) !important; /* Force high contrast in light mode */
+  }
+
+  .dark .text-high-contrast {
+    color: rgb(241 245 249) !important; /* Force high contrast in dark mode */
+  }
+
+  /* Form elements high contrast */
+  .form-label {
+    @apply text-slate-800 dark:text-gray-200;
+    color: rgb(30 41 59) !important; /* Force high contrast for labels */
+  }
+
+  .dark .form-label {
+    color: rgb(
+      229 231 235
+    ) !important; /* Force high contrast for labels in dark mode */
+  }
+
+  .form-input {
+    @apply text-slate-900 dark:text-gray-100;
+    color: rgb(15 23 42) !important; /* Force high contrast for input text */
+  }
+
+  .dark .form-input {
+    color: rgb(
+      248 250 252
+    ) !important; /* Force high contrast for input text in dark mode */
+  }
+
+  /* Toast positioning and visibility fixes */
+  .toast-container {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    z-index: 9999 !important;
+    max-width: 400px !important;
+  }
+
+  /* Background overlay for out-of-bounds elements */
+  .modal-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background-color: rgba(0, 0, 0, 0.03) !important;
+    z-index: 9998 !important;
+    pointer-events: none !important;
+    display: none !important;
+  }
+
+  .dark .modal-overlay {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+  }
+
+  /* Show overlay when toasts are visible */
+  body:has([data-sonner-toast]) .modal-overlay {
+    display: block !important;
+  }
+
+  /* Responsive toast positioning for mobile */
+  @media (max-width: 640px) {
+    .toast-container {
+      top: 20px !important;
+      right: 10px !important;
+      left: 10px !important;
+      max-width: calc(100vw - 20px) !important;
+    }
+
+    [data-sonner-toast] {
+      max-width: 100% !important;
+    }
+  }
+
+  /* Ensure toasts are never transparent and always visible */
+  [data-sonner-toast] {
+    opacity: 1 !important;
+    background-color: white !important;
+    border: 1px solid #e5e7eb !important;
+    color: #111827 !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
+    border-radius: 12px !important;
+    padding: 16px 20px !important;
+    font-size: 14px !important;
+    max-width: 400px !important;
+    word-wrap: break-word !important;
+    position: relative !important;
+    z-index: 10000 !important;
+  }
+
+  .dark [data-sonner-toast] {
+    background-color: rgba(31, 41, 55, 0.95) !important;
+    border: 1px solid #4b5563 !important;
+    color: #f9fafb !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* Success toast styling */
+  [data-sonner-toast][data-type="success"] {
+    border-left: 4px solid #10b981 !important;
+    background-color: rgba(255, 255, 255, 0.98) !important;
+  }
+
+  .dark [data-sonner-toast][data-type="success"] {
+    background-color: rgba(31, 41, 55, 0.98) !important;
+  }
+
+  /* Error toast styling */
+  [data-sonner-toast][data-type="error"] {
+    border-left: 4px solid #ef4444 !important;
+    background-color: rgba(255, 255, 255, 0.98) !important;
+  }
+
+  .dark [data-sonner-toast][data-type="error"] {
+    background-color: rgba(31, 41, 55, 0.98) !important;
+  }
+
+  /* Dropdown menu background overlay */
+  [data-radix-popper-content-wrapper] {
+    z-index: 9999 !important;
+  }
+
+  /* Ensure dropdown menus have proper background */
+  [role="menu"] {
+    background-color: white !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+    border-radius: 8px !important;
+  }
+
+  .dark [role="menu"] {
+    background-color: rgb(31, 41, 55) !important;
+    border: 1px solid #4b5563 !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
+}
+
+/* Animations */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: none;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
 }
