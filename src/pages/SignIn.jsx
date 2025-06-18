@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,7 +13,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/useAuth.js";
 
-export const SignIn = ({ onNavigateToSignUp }) => {
+export const SignIn = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({
@@ -21,6 +22,7 @@ export const SignIn = ({ onNavigateToSignUp }) => {
   });
 
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,7 +33,8 @@ export const SignIn = ({ onNavigateToSignUp }) => {
       const result = await login(formData.email, formData.password);
       if (result.success) {
         console.log("Login successful");
-        // App.jsx will auto-redirect based on user change
+        // Navigate to chat page after successful login
+        navigate("/chat", { replace: true });
       }
     } catch (err) {
       console.error("Login error:", err);
@@ -54,11 +57,11 @@ export const SignIn = ({ onNavigateToSignUp }) => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4 bg-gradient-to-br from-red-50 via-white to-orange-50 dark:from-white-900 dark:via-white-800 dark:to-red-900">
-      <Card className="w-full max-w-md border-0 shadow-2xl bg-black/80 dark:bg-slate-500">
+    <div className="flex items-center justify-center min-h-screen p-4 bg-gradient-to-br from-red-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-red-900">
+      <Card className="w-full max-w-md border-0 shadow-2xl bg-black/80 dark:bg-slate-800">
         <CardHeader className="pb-8 space-y-4 text-center">
           <div className="flex items-center justify-center w-16 h-16 mx-auto bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl">
-            <div className="flex items-center justify-center w-8 h-8 bg-white rounded-lg dark:bg-white-900">
+            <div className="flex items-center justify-center w-8 h-8 bg-white rounded-lg dark:bg-gray-900">
               <div className="w-4 h-4 rounded bg-gradient-to-br from-red-500 to-orange-500"></div>
             </div>
           </div>
@@ -66,7 +69,7 @@ export const SignIn = ({ onNavigateToSignUp }) => {
             <CardTitle className="text-2xl font-bold text-transparent bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text">
               Welcome Back
             </CardTitle>
-            <CardDescription className="mt-2 text-white-600 dark:text-white-300">
+            <CardDescription className="mt-2 text-gray-300 dark:text-gray-300">
               Sign in to continue to ZeroCode Chat
             </CardDescription>
           </div>
@@ -99,7 +102,7 @@ export const SignIn = ({ onNavigateToSignUp }) => {
             <div className="space-y-2">
               <Label
                 htmlFor="email"
-                className="text-white-700 dark:text-white-300"
+                className="text-gray-300 dark:text-gray-300"
               >
                 Email
               </Label>
@@ -109,7 +112,7 @@ export const SignIn = ({ onNavigateToSignUp }) => {
                 placeholder="Enter your email"
                 value={formData.email}
                 onChange={(e) => handleInputChange("email", e.target.value)}
-                className="border-white-200 dark:border-white-700 focus:border-red-500 dark:focus:border-red-400"
+                className="border-gray-600 bg-gray-800 text-white placeholder-gray-400 focus:border-red-500 dark:focus:border-red-400"
                 required
               />
             </div>
@@ -117,7 +120,7 @@ export const SignIn = ({ onNavigateToSignUp }) => {
             <div className="space-y-2">
               <Label
                 htmlFor="password"
-                className="text-white-700 dark:text-white-300"
+                className="text-gray-300 dark:text-gray-300"
               >
                 Password
               </Label>
@@ -127,7 +130,7 @@ export const SignIn = ({ onNavigateToSignUp }) => {
                 placeholder="Enter your password"
                 value={formData.password}
                 onChange={(e) => handleInputChange("password", e.target.value)}
-                className="border-white-200 dark:border-white-700 focus:border-red-500 dark:focus:border-red-400"
+                className="border-gray-600 bg-gray-800 text-white placeholder-gray-400 focus:border-red-500 dark:focus:border-red-400"
                 required
               />
             </div>
@@ -157,14 +160,14 @@ export const SignIn = ({ onNavigateToSignUp }) => {
           </form>
 
           <div className="text-center">
-            <p className="text-sm text-white-600 dark:text-white-400">
+            <p className="text-sm text-gray-400 dark:text-gray-400">
               Don't have an account?{" "}
-              <button
-                onClick={onNavigateToSignUp}
-                className="font-medium text-red-600 transition-colors dark:text-red-400 hover:text-red-500"
+              <Link
+                to="/signup"
+                className="font-medium text-red-500 transition-colors hover:text-red-400 underline"
               >
                 Sign up here
-              </button>
+              </Link>
             </p>
           </div>
         </CardContent>

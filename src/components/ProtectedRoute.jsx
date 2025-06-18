@@ -1,8 +1,9 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth.js";
 
 export const ProtectedRoute = ({ children }) => {
   const { user, isLoading } = useAuth();
+  const location = useLocation();
 
   // Show loading while checking authentication
   if (isLoading) {
@@ -23,11 +24,12 @@ export const ProtectedRoute = ({ children }) => {
     );
   }
 
-  // Redirect to signin if not authenticated or user is null
+  // Redirect to signin if not authenticated
   if (!user) {
-    return <Navigate to="/signin" replace />;
+    // Save the attempted location to redirect back after login
+    return <Navigate to="/signin" state={{ from: location }} replace />;
   }
 
-  // Render protected content only if user is properly authenticated and exists
+  // Render protected content if user is authenticated
   return children;
 };

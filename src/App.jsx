@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,12 +8,12 @@ import { useAuth } from "@/hooks/useAuth.js";
 import { SignIn } from "@/pages/SignIn.jsx";
 import { SignUp } from "@/pages/SignUp.jsx";
 import { Chat } from "@/pages/Chat.jsx";
+import { ProtectedRoute } from "@/components/ProtectedRoute.jsx";
 
 const queryClient = new QueryClient();
 
 const AppContent = () => {
-  const { user, isLoading, logout } = useAuth();
-  const [currentPage, setCurrentPage] = useState("signin"); // 'signin' | 'signup'
+  const { user, isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -32,22 +33,43 @@ const AppContent = () => {
     );
   }
 
-  // ✅ Show main chat interface if logged in
-  if (user) {
-    return <Chat user={user} onLogout={logout} />;
-  }
-
-  // 🧾 Show SignIn or SignUp based on state
-  if (currentPage === "signin") {
-    return <SignIn onNavigateToSignUp={() => setCurrentPage("signup")} />;
-  }
-
-  if (currentPage === "signup") {
-    return <SignUp onNavigateToSignIn={() => setCurrentPage("signin")} />;
-  }
-
-  // Default fallback
-  return <SignIn onNavigateToSignUp={() => setCurrentPage("signup")} />;
+  return (
+    <Router>
+      <Routes>
+        {/* Public routes */}
+        <Route 
+          path="/signin" 
+          element={user ? <Navigate to="/chat" replace /> : <SignIn />} 
+        />
+        <Route 
+          path="/signup" 
+          element={user ? <Navigate to="/chat" replace /> : <SignUp />} 
+        />
+        
+        {/* Protected routes */}
+        <Route 
+          path="/chat" 
+          element={
+            <ProtectedRoute>
+              <Chat />
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* Default redirect */}
+        <Route 
+          path="/" 
+          element={<Navigate to={user ? "/chat" : "/signin"} replace />} 
+        />
+        
+        {/* Catch all other routes */}
+        <Route 
+          path="*" 
+          element={<Navigate to={user ? "/chat" : "/signin"} replace />} 
+        />
+      </Routes>
+    </Router>
+  );
 };
 
 const App = () => (
