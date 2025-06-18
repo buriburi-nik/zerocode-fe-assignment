@@ -117,7 +117,9 @@ function ChatInterface() {
   };
 
   const sendMessage = async (messageText = null) => {
-    const textToSend = messageText || inputValue.trim();
+    const rawText = messageText || inputValue.trim();
+    // Ensure we always send a string
+    const textToSend = typeof rawText === "string" ? rawText.trim() : "";
     if (!textToSend || isTyping) return;
 
     const userMessage = {
@@ -138,9 +140,17 @@ function ChatInterface() {
         user?.name || "User",
       );
 
+      // Ensure the response is always a string
+      const responseText =
+        typeof botResponse === "string"
+          ? botResponse
+          : typeof botResponse === "object"
+            ? JSON.stringify(botResponse, null, 2)
+            : String(botResponse);
+
       const botMessage = {
         id: (Date.now() + 1).toString(),
-        text: botResponse,
+        text: responseText,
         sender: "bot",
         timestamp: new Date(),
       };
@@ -168,8 +178,11 @@ function ChatInterface() {
   };
 
   const handleVoiceInput = (transcript) => {
-    if (transcript.trim()) {
-      sendMessage(transcript.trim());
+    // Ensure transcript is always a string
+    const safeTranscript =
+      typeof transcript === "string" ? transcript.trim() : "";
+    if (safeTranscript) {
+      sendMessage(safeTranscript);
     }
   };
 
